@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="847413011409-nm6os927jre5ubfs97o7n2e5dl0meeqn.apps.googleusercontent.com">
+    <meta name="google-signin-hosted_domain" content="847413011409-nm6os927jre5ubfs97o7n2e5dl0meeqn.apps.googleusercontent.com">
+
+    <title>Zendesk Ticket Collector</title>
+    <link href="{% static "css/bootstrap.css" %}" rel="stylesheet" type="text/css"/>
+    <link href="{% static "css/main.css" %}" rel="stylesheet" type="text/css"/>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
+</head>
+<body>
+
+<div class="container">
+    <div id="main-page-heading" class="row" style="">
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-6">
+            <h1>Zendesk Ticket Collector</h1>
+        </div>
+        <div class="col-md-3">
+        </div>
+
+
+    </div>
+    <div class="row" >
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+            <p>{{ error_message}} </p>
+
+        </div>
+        <div class="col-md-4">
+        </div>
+    </div>
+    </div>
+</div>
+
+
+</body>
+</html>
