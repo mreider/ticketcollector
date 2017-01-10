@@ -161,4 +161,11 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.associate_user',
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details',
+    'app.social_auth_pipline.save_profile',
+)
+SOCIAL_AUTH_DISCONNECT_PIPELINE = (
+    'social.pipeline.disconnect.allowed_to_disconnect',
+    'social.pipeline.disconnect.get_entries',
+    'social.pipeline.disconnect.revoke_tokens',
+    'social.pipeline.disconnect.disconnect'
 )

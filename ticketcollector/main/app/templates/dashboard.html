@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Zendesk Ticket Collector</title>
-</head>
-<body>
-    {{request.user.username}}
-</body>
-</html>
+{% extends "base.html"%}
+{% load staticfiles %}
+{% block content%}
+    Welcome {{request.user.first_name}} {{ request.user.last_name}}
+{% endblock %}

@@ -24,5 +24,5 @@ urlpatterns = [
     # url(r'', include('social_auth.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
-    # url('^auth/', include('django.contrib.auth.urls', namespace='auth')),
+    url(r'', include('django.contrib.auth.urls', namespace='auth')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

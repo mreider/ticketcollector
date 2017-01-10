@@ -3,3 +3,21 @@
     min-height:250px;
     margin-top:100px;
 }
+.navbar-brand>img{
+    display:inline !important;
+    margin-top:-15px;
+}
+#main{
+    height:50%;
+    min-height:500px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+.footer p{
+    margin-top:15px!important;
+}
