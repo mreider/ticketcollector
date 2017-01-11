@@ -22,19 +22,20 @@
             {% include "menu.html" %}
         </header>
         <div id="main">
+            {% include 'infobox.html' %}
             {% block content %}
             {% endblock %}
         </div>
-        <footer class="footer">
-            <div class="container">
-                <div class="col-md-4"></div>
-                <div class="col-md-4">
-                    <p>Zendesk Ticket Collector</p>
-                </div>
-                <div class="col-md-4"></div>
+        <!--<footer class="footer">-->
+            <!--<div class="container">-->
+                <!--<div class="col-md-4"></div>-->
+                <!--<div class="col-md-4">-->
+                    <!--<p>Zendesk Ticket Collector</p>-->
+                <!--</div>-->
+                <!--<div class="col-md-4"></div>-->
 
-            </div>
-        </footer>
+            <!--</div>-->
+        <!--</footer>-->
     </div>
   </body>
 </html>

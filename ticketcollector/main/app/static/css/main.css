@@ -21,3 +21,17 @@
 .footer p{
     margin-top:15px!important;
 }
+.row.vdivide [class*='col-']:nth-child(odd):after{
+  background: #000;
+  width: 1px;
+  content: "";
+  display:block;
+  position: absolute;
+  top:0;
+  bottom: 0;
+  right: 0;
+  min-height: 100%;
+}
+.row{
+    margin-top:5px;
+}

@@ -13,6 +13,6 @@ For running ticket collector , please follow below steps.
    ##### Right now DB is in SQLite , once development is over we can move to Postgres/MySQL .
    ##### But that will be handled automatically by django through migration command.
 6. Run server
-   >> python manage.py runserver
+   >> python manage.py runserver 0.0.0.0:8080
 
-7. Access application @ [http://localhost:8000/tickets/](http://localhost:8000/tickets/)
+7. Access application @ [http://localhost:8000/tickets/](http://localhost:8000/tickets/) Or the IP:8080

@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from django.contrib.messages import constants
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -169,3 +171,15 @@ SOCIAL_AUTH_DISCONNECT_PIPELINE = (
     'social.pipeline.disconnect.revoke_tokens',
     'social.pipeline.disconnect.disconnect'
 )
+
+ZENDDESK_CONFIG = {
+    'zdesk_email': 'jijoy21@gmail.com',
+    'zdesk_password': '9zVh79RQHIkTqwgMtkR9jsLQJJSNGxZtC4qUkRP8',
+    'zdesk_url': 'https://jijoytest.zendesk.com',
+    'zdesk_token': True
+}
+
+MESSAGE_TAGS = {
+    constants.ERROR: 'danger',
+    50: 'critical',
+}

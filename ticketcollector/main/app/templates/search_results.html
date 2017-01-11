@@ -1,0 +1,72 @@
+{% extends "base.html"%}
+{% load staticfiles %}
+{% block content%}
+    <style>
+
+        .row{
+            margin-left:0px !important;
+        }
+    </style>
+    <div class="container">
+      <div class="row vdivide" style="height:100%;">
+        <div class="col-sm-4" style="height:100%;">
+            <form method="get" action="{% url 'search_results' %}">
+                <div class="row">
+                    <span>Type your search criteria below</span>
+                </div>
+                <div class="row">
+                    <textarea id="search" cols="35" rows="5" name="query">{{query}}</textarea>
+                </div>
+                <div class="row">
+                    <button class="btn btn-primary" id="search-btn" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-8" style="height:100%;">
+            <td class="row">
+            {% if results %}
+                <div class="row">
+                    <button class="btn">Save</button>
+                </div>
+                <div class="row">
+                    <span>{{search_count}} result(s)</span>
+                </div>
+                <td class="row">
+                    <table class="table">
+                    {% for item in results %}
+                        <tr>
+                            <td>
+                                Request Data : {{item.created}}
+                            </td>
+                            <td>
+                                <button class="btn view-btn" data-ticket="{{item.id}}">View</button>
+                            </td>
+                        </div>
+                        <tr>
+                           <td> Ticket #  {{ item.ticket_id}}</td>
+                        </div>
+                        <tr>
+                            <td>
+                                Requester : {{item.requester}}
+                            </td>
+                        </tr>
+                        <tr>
+                           <td>
+                                {{item.ticket_name}}
+                            </td>
+                            <td>
+                                <button class="btn add-to-collection-btn" data-ticket="{{item.id}}">Add to Collection Doc</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </table>
+                    <hr/>
+                </div>
+            {% endif %}
+                </div>
+        </div>
+
+
+      </div>
+    </div>
+{% endblock %}

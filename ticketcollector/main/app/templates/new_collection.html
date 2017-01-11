@@ -1,0 +1,29 @@
+{% extends "base.html"%}
+{% load staticfiles %}
+{% block content%}
+    <style>
+
+    </style>
+    <div class="container">
+      <div class="row vdivide">
+        <div class="col-sm-4 mainblock" style="height:100%;">
+            <form method="get" action="{% url 'search_results' %}">
+            <div class="row">
+                <span>Type your search criteria below</span>
+            </div>
+            <div class="row">
+                <textarea id="search" cols="35" rows="5" name="query"></textarea>
+            </div>
+            <div class="row">
+                <button class="btn btn-primary" id="search-btn" type="submit">Search</button>
+            </div>
+                </form>
+        </div>
+        <div class="col-sm-8 text-center">
+
+        </div>
+
+
+      </div>
+    </div>
+{% endblock %}
