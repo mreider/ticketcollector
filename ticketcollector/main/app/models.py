@@ -18,7 +18,7 @@ class Collection(models.Model):
 
 class Ticket(models.Model):
     ticket_id = models.AutoField(primary_key=True)
-    collection = models.ForeignKey(Collection,related_name="collection")
+    collection = models.ForeignKey(Collection,related_name="ticket_collection")
     zd_ticket_id = models.CharField(max_length=1000)
     subject = models.CharField(max_length=1000)
     requester = models.CharField(max_length=1000)
@@ -27,8 +27,14 @@ class Ticket(models.Model):
 
 class Comments(models.Model):
     comment_id = models.AutoField(primary_key=True)
-    ticket = models.ForeignKey(Ticket,related_name="ticket")
+    ticket = models.ForeignKey(Ticket,related_name="comment_ticket")
     zd_comment_id = models.CharField(max_length=1000)
     created_at = models.DateTimeField()
     plain_body = models.TextField()
     is_public = models.BooleanField()
+
+
+class CollectionDocTicket(models.Model):
+    collection_doc_ticket_id = models.AutoField(primary_key=True)
+    collection = models.ForeignKey(Collection,related_name="doc_collection")
+    ticket = models.ManyToManyField(Ticket,related_name="doc_tickets")

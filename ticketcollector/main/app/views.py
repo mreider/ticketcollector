@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render
 # Create your views here.
 from django.urls import reverse
@@ -12,6 +13,8 @@ from django.views import View
 from django.contrib.auth import logout as auth_logout
 from zdesk import Zendesk
 from zdesk import ZendeskError
+
+from .forms import CollectionCreateForm
 
 
 class HomeView(View):
@@ -29,6 +32,21 @@ class NewCollectionView(View):
     @method_decorator(login_required(login_url="/tickets/"))
     def get(self, request):
         return render(request, self.template_name)
+
+class CollectionSaveView(View):
+
+    @method_decorator(login_required(login_url="/tickets/"))
+    def post(self, request):
+        form = CollectionCreateForm(request.POST)
+        if form.is_valid():
+            instance = form.save()
+            return JsonResponse({"status":"Success",
+                                 "message": "Collection name already exists.Choose another name.",
+                                 "collection_id":instance.collection_id,
+                                 "collection_name":instance.name})
+        else:
+            return JsonResponse({"status":"Failed","error":"Collection name already exists.Choose another name."})
+
 
 class TicketItem:
     def __init__(self,**kwargs):
