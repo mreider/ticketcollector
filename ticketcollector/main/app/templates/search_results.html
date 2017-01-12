@@ -1,6 +1,31 @@
 {% extends "base.html"%}
 {% load staticfiles %}
+{% block extra_style %}
+<link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+{% endblock %}
+{% block extra_js %}
+<script  src="{% static 'js/jquery-ui.js' %}"></script>
+<script  src="{% static 'js/main.js' %}"></script>
+{% endblock %}
 {% block content%}
+
+  <!-- Modal -->
+  <div class="modal fade" id="error-message-dlg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content panel-warning">
+        <div class="modal-header panel-heading">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Error Message</h4>
+        </div>
+        <div class="modal-body">
+            You can't do anything with the collection until you save it.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
     <style>
 
         .row{
@@ -8,23 +33,24 @@
         }
     </style>
     <div class="container">
+        <input type="hidden" id="current-collection" value="{{request.session.current_collection}}">
       <div class="row vdivide" style="height:100%;">
         <div class="col-sm-4" style="height:100%;">
-            <form method="get" action="{% url 'search_results' %}">
+            <form method="get" action="{% url 'search_results' %}" id="search-form">
                 <div class="row">
                     <span>Type your search criteria below</span>
                 </div>
                 <div class="row">
-                    <textarea id="search" cols="35" rows="5" name="query">{{query}}</textarea>
+                    <textarea id="search" cols="35" rows="5" name="query" required>{{query}}</textarea>
                 </div>
                 <div class="row">
                     <button class="btn btn-primary" id="search-btn" type="submit">Search</button>
                 </div>
             </form>
         </div>
-        <div class="col-sm-8" style="height:100%;">
+        <div class="col-sm-8" style="">
             <td class="row">
-            {% if results %}
+
                 <div class="row">
                     <button class="btn">Save</button>
                 </div>
@@ -32,6 +58,7 @@
                     <span>{{search_count}} result(s)</span>
                 </div>
                 <td class="row">
+                    {% if results %}
                     <table class="table">
                     {% for item in results %}
                         <tr>
@@ -55,14 +82,15 @@
                                 {{item.ticket_name}}
                             </td>
                             <td>
-                                <button class="btn add-to-collection-btn" data-ticket="{{item.id}}">Add to Collection Doc</button>
+                                <button class="btn add-to-collection-btn" data-ticket="{{item.id}}" >Add to Collection Doc</button>
                             </td>
                         </tr>
                     {% endfor %}
                     </table>
+                     {% endif %}
                     <hr/>
                 </div>
-            {% endif %}
+
                 </div>
         </div>
 

@@ -1,11 +1,12 @@
 import json
 
+import toolz
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-
+import toolz
 # Create your views here.
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -37,6 +38,11 @@ class TicketItem:
         self.ticket_id = kwargs.get('id')
         self.created = kwargs.get('created')
         self.requester = kwargs.get('requester')
+    def __eq__(self, other):
+        return self.ticket_id==other.ticket_id
+
+    def __hash__(self):
+        return hash(('ticket_id', self.ticket_id))
 
 class SearchResultsView(View):
     template_name = "search_results.html"
@@ -55,6 +61,9 @@ class SearchResultsView(View):
                                    requester=requester))
         return data
 
+    def filter_duplicate(self,data):
+        return list(set(data))
+
     @method_decorator(login_required(login_url="/tickets/"))
     def get(self,request):
         search_query = request.GET.get('query')
@@ -66,8 +75,9 @@ class SearchResultsView(View):
             data = []
             for single_query in search_query.split('[+]'):
                 data.extend(self.do_search(query=single_query))
-            context['results'] = data
-            context['search_count'] = len(data) if len(data) > 0 else 0
+            filtered_data = self.filter_duplicate(data)
+            context['results'] = filtered_data
+            context['search_count'] = len(filtered_data) if len(filtered_data) > 0 else 0
             return render(request, self.template_name,context)
         except ZendeskError,e:
             print 'Error %s'%e.response.text

@@ -1,5 +1,12 @@
 {% extends "base.html"%}
 {% load staticfiles %}
+{% block extra_style %}
+<link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+{% endblock %}
+{% block extra_js %}
+<script  src="{% static 'js/jquery-ui.js' %}"></script>
+<script  src="{% static 'js/main.js' %}"></script>
+{% endblock %}
 {% block content%}
     <style>
 
@@ -7,12 +14,12 @@
     <div class="container">
       <div class="row vdivide">
         <div class="col-sm-4 mainblock" style="height:100%;">
-            <form method="get" action="{% url 'search_results' %}">
+            <form method="get" action="{% url 'search_results' %}" id="search-form">
             <div class="row">
                 <span>Type your search criteria below</span>
             </div>
             <div class="row">
-                <textarea id="search" cols="35" rows="5" name="query"></textarea>
+                <textarea id="search" cols="35" rows="5" name="query" required></textarea>
             </div>
             <div class="row">
                 <button class="btn btn-primary" id="search-btn" type="submit">Search</button>
