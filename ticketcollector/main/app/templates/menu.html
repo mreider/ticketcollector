@@ -22,12 +22,16 @@
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
               <li class="active"><a href="{% url 'new_collection' %}">New Collection</a></li>
-              <li><a href="#">Saved Collection</a></li>
+              <li><a href="{% url 'list_collection' %}">Saved Collections</a></li>
               <li><a href="{% url 'logout' %}">Logout</a></li>
 
             </ul>
               <ul class="nav navbar-nav navbar-right">
-                <li> <p class="navbar-text" id="current-collection" style="display:none;"></p></li>
+                <li> <p class="navbar-text" id="current-collection" {% if not collection %} style="display:none;" {% endif %}>
+                    {% if collection %}
+                        Current Collection Name : {{collection.name}}
+                    {% endif %}
+                    </p></li>
               </ul>
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->

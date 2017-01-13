@@ -5,17 +5,59 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 # Create your views here.
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.contrib.auth import logout as auth_logout
+from django.views.generic import DetailView
+from django.views.generic import ListView
 from zdesk import Zendesk
 from zdesk import ZendeskError
 
+from .models import Collection,Ticket,Comment
 from .forms import CollectionCreateForm
 
+class SearchHelper():
+    def do_search(self,query):
+        data = []
+        zendesk = Zendesk(**settings.ZENDDESK_CONFIG)
+        results = zendesk.search(query='type:ticket sort:desc ' + query)
+        # print 'Results %s' % json.dumps(results)
+        for item in results.get('results'):
+            ticket_id = item.get('id')
+            response = zendesk.user_show(id=item.get('requester_id')).get('user')
+            requester = response.get('name') + ' ' + response.get('email')
+            comments_response = zendesk.ticket_comments(ticket_id=ticket_id)
+            ticket_item = TicketItem(name=item.get('subject'), id=ticket_id, created=item.get('created_at'),
+                                   requester=requester,description=item.get('description'),
+                                   is_public=item.get('is_public'))
+            for cm in comments_response.get('comments'):
+                posted_by_response = zendesk.user_show(id=cm.get('author_id')).get('user')
+                posted_by = posted_by_response.get('name') + ' ' + posted_by_response.get('email')
+                ticket_item.get_comments().append(TicketCommentItem(comment_id=cm.get('id'),ticket_id=ticket_id,
+                                             is_public=cm.get('public'),comment=cm.get('plain_body'),
+                                             posted_by=posted_by,created_at=cm.get('created_at')))
+
+            data.append(ticket_item)
+        return data
+
+    def filter_duplicate(self,data):
+        cleaned_data = []
+        for x in data :
+            if x not in cleaned_data:
+                cleaned_data.append(x)
+        return cleaned_data
+    def search(self,search_query):
+        data = []
+        for single_query in search_query.split('[+]'):
+
+            temp = self.do_search(query=single_query)
+            for x in temp:
+                data.append(x)
+        filtered_data = self.filter_duplicate(data)
+        return filtered_data
 
 class HomeView(View):
     template_name = 'home.html'
@@ -33,68 +75,158 @@ class NewCollectionView(View):
     def get(self, request):
         return render(request, self.template_name)
 
-class CollectionSaveView(View):
+class TicketCommentItem:
+    def __init__(self,**kwargs):
+        self.comment_id = kwargs.get('comment_id')
+        self.ticket_id = kwargs.get('ticket_id')
+        self.is_public = kwargs.get('is_public')
+        self.comment = kwargs.get('comment')
+        self.posted_by = kwargs.get('posted_by')
+        self.created_at = kwargs.get('created_at')
+    def __eq__(self, other):
+        return self.comment_id==other.comment_id
 
-    @method_decorator(login_required(login_url="/tickets/"))
-    def post(self, request):
-        form = CollectionCreateForm(request.POST)
-        if form.is_valid():
-            instance = form.save()
-            return JsonResponse({"status":"Success",
-                                 "message": "Collection name already exists.Choose another name.",
-                                 "collection_id":instance.collection_id,
-                                 "collection_name":instance.name})
-        else:
-            return JsonResponse({"status":"Failed","error":"Collection name already exists.Choose another name."})
-
+    def __hash__(self):
+        return hash(('comment_id', self.comment_id))
 
 class TicketItem:
+
+    def add_comment(self,comment):
+        self.comments.append(comment)
+    def add_comments(self,comments):
+        self.comments.extend(comments)
+
+    def get_comments(self):
+        return self.comments
+
     def __init__(self,**kwargs):
         self.ticket_name = kwargs.get('name')
         self.ticket_id = kwargs.get('id')
+
         self.created = kwargs.get('created')
         self.requester = kwargs.get('requester')
+        self.description = kwargs.get('description')
+        self.is_public = kwargs.get('is_public')
+        self.comments = []
+
     def __eq__(self, other):
         return self.ticket_id==other.ticket_id
 
     def __hash__(self):
         return hash(('ticket_id', self.ticket_id))
 
+class CollectionSaveView(View):
+
+    def save_seach_results(self,collection,search_results):
+
+        for ticket_item in search_results:
+            ticket = Ticket()
+            ticket.collection = collection
+            ticket.zd_ticket_id = ticket_item.ticket_id
+            ticket.subject = ticket_item.ticket_name
+            ticket.requester = ticket_item.requester
+            ticket.description = ticket_item.description
+            ticket.created_at = ticket_item.created
+            ticket.save()
+            for comment_item in ticket_item.get_comments():
+                comment = Comment()
+                comment.ticket = ticket
+                comment.zd_comment_id = comment_item.comment_id
+                comment.posted_by = comment_item.posted_by
+                comment.created_at = comment_item.created_at
+                comment.plain_body = comment_item.comment
+                comment.is_public = comment_item.is_public
+                comment.save()
+
+
+    @method_decorator(login_required(login_url="/tickets/"))
+    def post(self, request):
+        # print request.POST
+        form = CollectionCreateForm(request.POST)
+        if form.is_valid():
+            instance = form.save()
+            filtered_data = SearchHelper().search(request.POST.get('search_criteria'))
+            self.save_seach_results(instance,filtered_data)
+            return JsonResponse({"status":"Success",
+                                 "message": "Collection name already exists.Choose another name.",
+                                 "collection_id":instance.collection_id,
+                                 "collection_name":instance.name})
+        else:
+            print form.errors
+            return JsonResponse({"status":"Failed","error":"Collection name already exists.Choose another name."})
+
+
+class TicketDetailsView(DetailView):
+    template_name = "ticket_details_content.html"
+    model = Ticket
+
+    def get_context_data(self, **kwargs):
+        context = super(TicketDetailsView, self).get_context_data(**kwargs)
+        return context
+
+class TicketSearchDetailsView(DetailView):
+    template_name = "ticket_details_content.html"
+
+    def get(self, request,ticket_id):
+        context = {}
+        ticket = Ticket.objects.filter(zd_ticket_id=ticket_id).first()
+        context['object'] = ticket
+        return render(request, self.template_name, context)
+
+
+class CollectionListView(ListView):
+    model = Collection
+    template_name = "collection_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(CollectionListView, self).get_context_data(**kwargs)
+        return context
+
+class CollectionDeleteView(View):
+    @method_decorator(login_required(login_url="/tickets/"))
+    def get(self, request, id_obj):
+        obj = get_object_or_404(Collection, collection_id=id_obj)
+        obj.delete()
+        message = 'Collection "{0}" successfully deleted.'.format(obj.name)
+        messages.add_message(request, messages.SUCCESS, message)
+        return redirect('list_collection')
+
+class CollectionDetailsView(View):
+
+    template_name = "collection_details.html"
+    @method_decorator(login_required(login_url="/tickets/"))
+    def get(self, request, id_obj):
+        obj = get_object_or_404(Collection, collection_id=id_obj)
+        context = {}
+        context['collection'] = obj
+        return render(request, self.template_name, context)
+
+
+
+
 class SearchResultsView(View):
     template_name = "search_results.html"
 
-    def do_search(self,query):
-        data = []
-        zendesk = Zendesk(**settings.ZENDDESK_CONFIG)
-        results = zendesk.search(query='type:ticket sort:desc ' + query)
-        print 'Results type %s' % results
-        for item in results.get('results'):
-            response = zendesk.user_show(id=item.get('requester_id')).get('user')
-            # print 'USer Response %s'%response
-            # print 'USer Response %s'%response.get('email')
-            requester = response.get('name') + ' ' + response.get('email')
-            data.append(TicketItem(name=item.get('subject'), id=item.get('id'), created=item.get('created_at'),
-                                   requester=requester))
-        return data
 
-    def filter_duplicate(self,data):
-        return list(set(data))
 
     @method_decorator(login_required(login_url="/tickets/"))
     def get(self,request):
         search_query = request.GET.get('query')
+        current_collection = request.GET.get('current-collection')
 
         context = {}
         context['query'] = search_query
         try:
 
-            data = []
-            for single_query in search_query.split('[+]'):
-                data.extend(self.do_search(query=single_query))
-            filtered_data = self.filter_duplicate(data)
+            filtered_data = SearchHelper().search(search_query)
             context['results'] = filtered_data
             context['search_count'] = len(filtered_data) if len(filtered_data) > 0 else 0
-            return render(request, self.template_name,context)
+            if current_collection:
+                collection = get_object_or_404(Collection,collection_id=current_collection)
+                context['collection'] = collection
+                render(request, 'collection_details.html', context)
+            else:
+                return render(request, self.template_name,context)
         except ZendeskError,e:
             print 'Error %s'%e.response.text
             messages.add_message(request, messages.ERROR, json.loads(e.response.text).get('error'))

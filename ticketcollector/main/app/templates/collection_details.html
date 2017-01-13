@@ -1,0 +1,91 @@
+{% extends "base.html"%}
+{% load staticfiles %}
+{% block extra_style %}
+<link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+{% endblock %}
+{% block extra_js %}
+<script  src="{% static 'js/jquery-ui.js' %}"></script>
+<script  src="{% static 'js/main.js' %}"></script>
+
+{% endblock %}
+{% block content%}
+{% include 'collection_not_saved_error_modal.html' %}
+{% include 'collection_save_modal.html' %}
+{% include 'ticket_details_modal.html' %}
+    <style>
+
+        .row{
+            margin-left:0px !important;
+        }
+    </style>
+    <div class="container">
+        <input type="hidden" id="current-collection" value="{{collection.name}}">
+      <div class="row vdivide" style="height:100%;">
+        <div class="col-sm-4" style="height:100%;">
+            <form method="get" action="{% url 'search_results' %}" id="search-form">
+                <input type="hidden" name="current-collection" value="{{collection.collection_id}}">
+                <div class="row">
+                    <span>Type your search criteria below</span>
+                </div>
+                <div class="row">
+                    <textarea id="search" cols="35" rows="5" name="query" disabled>{{collection.search_criteria}}</textarea>
+                </div>
+                <div class="row">
+                    <button class="btn btn-primary" id="search-btn" type="submit" disabled>Search</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-8" style="">
+            <div class="row">
+
+                <!--<div class="row">-->
+                    <!--<button class="btn" data-toggle="modal" data-target="#collection-save-modal" >Save</button>-->
+                <!--</div>-->
+                <div class="row">
+                    {% if collection %}
+                    <span>{{collection.ticket_collection.all.count}} result(s)</span>
+                    {% else %}
+                    <span>0 result(s)</span>
+                    {% endif %}
+                </div>
+                <div class="row">
+                    {% if collection %}
+                    <table class="table">
+                        {% for ticket in collection.ticket_collection.all %}
+                            <tr>
+                                <td>
+                                    Requested : {{ticket.created_at}}
+                                </td>
+                                <td>
+                                    <button class="btn view-btn" data-ticket="{{ticket.id}}" data-url="{% url 'ticket-detail' ticket.ticket_id %}"> View</button>
+                                </td>
+                            </div>
+                            <tr>
+                               <td> Ticket #  {{ ticket.ticket_id}}</td>
+                            </div>
+                            <tr>
+                                <td>
+                                    Requester : {{ticket.requester}}
+                                </td>
+                            </tr>
+                            <tr>
+                               <td>
+                                    {{ticket.subject}}
+                                </td>
+                                <td>
+                                    <button class="btn add-to-collection-btn"  data-ticket="{{ticket.id}}" >Add to Collection Doc</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                     {% endif %}
+                    <hr/>
+                </div>
+
+                </div>
+        </div>
+
+
+      </div>
+    </div>
+{% endblock %}

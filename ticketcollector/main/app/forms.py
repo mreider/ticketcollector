@@ -4,4 +4,4 @@ from .models import Collection
 class CollectionCreateForm(ModelForm):
     class Meta:
         model = Collection
-        fields = ['name']
+        fields = ['name','search_criteria']

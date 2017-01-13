@@ -8,49 +8,9 @@
 <script  src="{% static 'js/main.js' %}"></script>
 {% endblock %}
 {% block content%}
-
-  <!-- Modal -->
-  <div class="modal fade" id="error-message-dlg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content panel-warning">
-        <div class="modal-header panel-heading">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title">Error Message</h4>
-        </div>
-        <div class="modal-body">
-            You can't do anything with the collection until you save it.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade" id="collection-save-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form method="post" action="{% url 'save_collection' %}" id="save-collection-form">
-            {% csrf_token %}
-      <div class="modal-content panel-warning">
-        <div class="modal-header panel-heading">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title">Save new collection</h4>
-        </div>
-        <div class="modal-body">
-
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" class="form-control" name="name" required>
-                </div>
-
-        </div>
-        <div class="modal-footer">
-            <input type="submit" class="btn btn-primary" value="Save">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-          </form>
-      </div>
-    </div>
-  </div>
+{% include 'ticket_details_modal.html' %}
+{% include 'collection_not_saved_error_modal.html' %}
+{% include 'collection_save_modal.html' %}
     <style>
 
         .row{
@@ -58,10 +18,11 @@
         }
     </style>
     <div class="container">
-        <input type="hidden" id="current-collection" value="{{request.session.current_collection}}">
+        <!--<input type="hidden" id="current-collection" value="{{request.session.current_collection}}">-->
       <div class="row vdivide" style="height:100%;">
         <div class="col-sm-4" style="height:100%;">
             <form method="get" action="{% url 'search_results' %}" id="search-form">
+                <input type="hidden" id="current-collection-id" name = "current-collection-id" value="{{collection.collection_id}}">
                 <div class="row">
                     <span>Type your search criteria below</span>
                 </div>
@@ -74,48 +35,81 @@
             </form>
         </div>
         <div class="col-sm-8" style="">
-            <td class="row">
-
-                <div class="row">
-                    <button class="btn" data-toggle="modal" data-target="#collection-save-modal" >Save</button>
-                </div>
-                <div class="row">
-                    <span>{{search_count}} result(s)</span>
-                </div>
-                <td class="row">
-                    {% if results %}
-                    <table class="table">
-                    {% for item in results %}
-                        <tr>
-                            <td>
-                                Request Data : {{item.created}}
-                            </td>
-                            <td>
-                                <button class="btn view-btn" data-ticket="{{item.id}}">View</button>
-                            </td>
-                        </div>
-                        <tr>
-                           <td> Ticket #  {{ item.ticket_id}}</td>
-                        </div>
-                        <tr>
-                            <td>
-                                Requester : {{item.requester}}
-                            </td>
-                        </tr>
-                        <tr>
-                           <td>
-                                {{item.ticket_name}}
-                            </td>
-                            <td>
-                                <button class="btn add-to-collection-btn" data-ticket="{{item.id}}" >Add to Collection Doc</button>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </table>
-                     {% endif %}
-                    <hr/>
-                </div>
-
+            <div class="row">
+                {% if collection %}
+                    <div class="row">
+                        <span>{{collection.tickets.all.count}} result(s)</span>
+                    </div>
+                    <div class="row">
+                        <table class="table">
+                        {% for ticket in collection.tickets.all %}
+                            <tr>
+                                <td>
+                                    Requested : {{ticket.created_at}}
+                                </td>
+                                <td>
+                                    <button class="btn view-btn" data-ticket="{{ticket.ticket_id}}" data-url="{% url 'ticket-detail' ticket.ticket_id %}">View</button>
+                                </td>
+                            </div>
+                            <tr>
+                               <td> Ticket #  {{ ticket.ticket_id}}</td>
+                            </div>
+                            <tr>
+                                <td>
+                                    Requester : {{ticket.requester}}
+                                </td>
+                            </tr>
+                            <tr>
+                               <td>
+                                    {{ticket.subject}}
+                                </td>
+                                <td>
+                                    <button class="btn add-to-collection-btn" data-ticket="{{ticket.id}}" >Add to Collection Doc</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                {% else %}
+                    <div class="row">
+                        <button class="btn" data-toggle="modal" data-target="#collection-save-modal" id="save-btn">Save</button>
+                    </div>
+                    <div class="row">
+                        <span>{{search_count}} result(s)</span>
+                    </div>
+                    <td class="row">
+                        {% if results %}
+                        <table class="table">
+                        {% for item in results %}
+                            <tr>
+                                <td>
+                                    Request Data : {{item.created}}
+                                </td>
+                                <td>
+                                    <button class="btn view-btn" data-ticket="{{item.ticket_id}}" data-url="{% url 'ticket-detail-search' ticket_id=item.ticket_id %}">View</button>
+                                </td>
+                            </div>
+                            <tr>
+                               <td> Ticket #  {{ item.ticket_id}}</td>
+                            </div>
+                            <tr>
+                                <td>
+                                    Requester : {{item.requester}}
+                                </td>
+                            </tr>
+                            <tr>
+                               <td>
+                                    {{item.ticket_name}}
+                                </td>
+                                <td>
+                                    <button class="btn add-to-collection-btn" data-ticket="{{item.id}}" >Add to Collection Doc</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                         {% endif %}
+                        <hr/>
+                    </div>
+                {% endif %}
                 </div>
         </div>
 
