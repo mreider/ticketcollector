@@ -138,7 +138,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 # LOGIN_URL = '/login/social/'
-LOGIN_REDIRECT_URL = '/tickets/dashboard/'
+LOGIN_REDIRECT_URL = '/tickets/new_collection/'
 # LOGIN_ERROR_URL    = '/login-error/'
 LOGIN_ERROR_URL = '/tickets/login-error/'
 

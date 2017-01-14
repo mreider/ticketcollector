@@ -17,12 +17,16 @@
 
         .row{
             margin-left:0px !important;
+            margin-right:0px !important;
+        }
+        .container{
+
         }
     </style>
     <div class="container">
         <input type="hidden" id="current-collection" value="{{collection.name}}">
       <div class="row vdivide" style="height:100%;">
-        <div class="col-sm-4" style="height:100%;">
+        <div class="col-sm-4" style="height:100%;margin-left:-20px;">
             <form method="get" action="{% url 'search_results' %}" id="search-form">
                 <input type="hidden" name="current-collection" value="{{collection.collection_id}}">
                 <div class="row">
@@ -36,12 +40,9 @@
                 </div>
             </form>
         </div>
-        <div class="col-sm-8" style="">
+        <div class="col-sm-5" >
             <div class="row">
 
-                <!--<div class="row">-->
-                    <!--<button class="btn" data-toggle="modal" data-target="#collection-save-modal" >Save</button>-->
-                <!--</div>-->
                 <div class="row">
                     {% if collection %}
                     <span>{{collection.ticket_collection.all.count}} result(s)</span>
@@ -84,9 +85,33 @@
                 </div>
 
                 </div>
+
         </div>
 
+            <div class="col-sm-3" >
+                <table class="table">
+                        <tr >
+                            {% for coll_doc in collection.doc_collection.all %}
+                            <td> <span>Collection Doc</span></td>
+                            <td><button class="btn btn-default" id="view-doc-btn" data-url="{% url 'view-collection-doc-details' coll_doc.collection_doc_ticket_id%}">View</button></td>
+                            {% endfor %}
+                        </tr>
 
+                        <tr>
+                            <td>
+                                <u>Tickets</u>
+                            </td>
+                        </tr>
+                        {% for coll_doc in collection.doc_collection.all %}
+                            {% for ticket in coll_doc.ticket.all %}
+                            <tr>
+                                <td>{{ticket.zd_ticket_id}}</td>
+                                <td><a href="{% url 'remove-ticket-doc' collection_doc_ticket_id=coll_doc.collection_doc_ticket_id ticket_id=ticket.ticket_id%}">Remove</a></td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </table>
+                </div>
       </div>
     </div>
 {% endblock %}

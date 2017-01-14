@@ -16,9 +16,44 @@ $(document).ready(function() {
 
 
     $('.add-to-collection-btn').click(function(){
-        var current_collection = $('#current-collection').val();
-        if(current_collection == undefined | current_collection.length == 0){
+        var current_collection = $('#current-collection').text();
+        if(current_collection == undefined | current_collection.trim().length == 0){
                 $('#error-message-dlg').modal('show');
+        }else{
+            var url = $(this).data('url');
+            var collection = $(this).data('collection');
+            var ticket = $(this).data('ticket');
+            var form = $(document.createElement('form'));
+            $(form).attr("action", url);
+            $(form).attr("method", "POST");
+            if(collection == undefined ){
+                collection = $('#current-collection-id').val();
+            }
+            var input = $("<input>")
+                .attr("type", "hidden")
+                .attr("name", "collection")
+                .val(collection);
+
+
+            $(form).append($(input));
+            input = $("<input>")
+                .attr("type", "hidden")
+                .attr("name", "ticket")
+                .val(ticket);
+
+            var csrftoken = getCookie('csrftoken');
+            $(form).append($(input));
+            input = $("<input>")
+                .attr("type", "hidden")
+                .attr("name", "csrfmiddlewaretoken")
+                .val(csrftoken);
+
+            $(form).append($(input));
+
+            form.appendTo( document.body )
+            $(form).submit();
+            $("#cover").show();
+            return true;
         }
     });
 
@@ -40,8 +75,33 @@ $(document).ready(function() {
             });
         }
     });
+    $('#view-doc-btn').click(function(){
+            var modal = $('#colletion-doc-details-modal');
+            var url = $(this).data('url');
+            $.ajax({
+                url:url,
+                context: document.body
+            }).done(function(response) {
+                modal.html(response);
+                $(modal).modal('show');
+            });
+    });
 
+    $('#collect-doc-download-form').submit(function(){
+        var theForm = $(this);
+             $.ajax({
+                 type: theForm.attr('method'),
+                 url: theForm.attr('action'),
+                 data: theForm.serialize(),
+                 success: function(data) {
+                    $("#my_iframe").attr({
+                        "href" : "data:text/plain;base64," + data /* data[0] */
+                    }).get(0).click();                 }
+             });
 
+             // prevent submitting again
+             return false;
+    })
     $('#save-collection-form').submit(function(){
         var theForm = $(this);
         var search_string = $('#search').val();
@@ -86,3 +146,32 @@ $(document).ajaxStart(function () {
   .ajaxStop(function () {
     $("#cover").hide();
   });
+
+ function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+//$.ajaxSetup({
+//    beforeSend: function(xhr, settings) {
+//        var csrftoken = Cookies.get('csrftoken');
+//        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+//            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+//        }
+//    }
+//})

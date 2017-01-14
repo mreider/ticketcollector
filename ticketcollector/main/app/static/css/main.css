@@ -21,7 +21,7 @@
 .footer p{
     margin-top:15px!important;
 }
-.row.vdivide [class*='col-']:nth-child(odd):after{
+.row.vdivide [class*='col-']:after{
   background: #000;
   width: 1px;
   content: "";

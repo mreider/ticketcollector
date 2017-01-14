@@ -10,6 +10,7 @@
 {% block content%}
 {% include 'ticket_details_modal.html' %}
 {% include 'collection_not_saved_error_modal.html' %}
+{% include 'collection_doc_view_modal.html' %}
 {% include 'collection_save_modal.html' %}
     <style>
 
@@ -64,7 +65,7 @@
                                     {{ticket.subject}}
                                 </td>
                                 <td>
-                                    <button class="btn add-to-collection-btn" data-ticket="{{ticket.id}}" >Add to Collection Doc</button>
+                                    <button class="btn add-to-collection-btn"  data-collection="{{collection.collection_id}}" data-url="{% url 'collection-doc-details' collection.collection_id%}" data-ticket="{{ticket.ticket_id}}" >Add to Collection Doc</button>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -101,7 +102,7 @@
                                     {{item.ticket_name}}
                                 </td>
                                 <td>
-                                    <button class="btn add-to-collection-btn" data-ticket="{{item.id}}" >Add to Collection Doc</button>
+                                    <button class="btn add-to-collection-btn"  data-url="{% url 'collection-doc-details-search' %}" data-ticket="{{item.ticket_id}}" >Add to Collection Doc</button>
                                 </td>
                             </tr>
                         {% endfor %}

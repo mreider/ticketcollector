@@ -3,6 +3,7 @@ import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -16,7 +17,7 @@ from django.views.generic import ListView
 from zdesk import Zendesk
 from zdesk import ZendeskError
 
-from .models import Collection,Ticket,Comment
+from .models import Collection,Ticket,Comment, CollectionDocTicket
 from .forms import CollectionCreateForm
 
 class SearchHelper():
@@ -64,7 +65,7 @@ class HomeView(View):
 
     def get(self, request):
         if request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('tickets_dashboard'))
+            return HttpResponseRedirect(reverse('new_collection'))
         else:
             return render(request, self.template_name)
 
@@ -164,6 +165,14 @@ class TicketDetailsView(DetailView):
         context = super(TicketDetailsView, self).get_context_data(**kwargs)
         return context
 
+class CollectionDocView(DetailView):
+    template_name = "collection_doc_view_modal_content.html"
+    model = CollectionDocTicket
+
+    def get_context_data(self, **kwargs):
+        context = super(CollectionDocView, self).get_context_data(**kwargs)
+        return context
+
 class TicketSearchDetailsView(DetailView):
     template_name = "ticket_details_content.html"
 
@@ -173,6 +182,54 @@ class TicketSearchDetailsView(DetailView):
         context['object'] = ticket
         return render(request, self.template_name, context)
 
+
+class CollectionDocDetailsView(View):
+    template_name = 'collection_doc_details.html'
+
+    @method_decorator(login_required(login_url="/tickets/"))
+    def post(self,request,collection_id):
+        ticket_id = request.POST.get('ticket')
+        colletion = get_object_or_404(Collection,collection_id=collection_id)
+        ticket = get_object_or_404(Ticket,ticket_id=ticket_id)
+        colletion_doc,created = CollectionDocTicket.objects.get_or_create(collection=colletion)
+        colletion_doc.collection = colletion
+        colletion_doc.ticket.add(ticket)
+        colletion_doc.save()
+        return HttpResponseRedirect(reverse('collection-doc-details',kwargs={'collection_id':colletion.collection_id}))
+
+    @method_decorator(login_required(login_url="/tickets/"))
+    def get(self, request,collection_id):
+        context = {}
+        collection = get_object_or_404(Collection,collection_id=collection_id)
+        context['collection'] = collection
+        return render(request, self.template_name, context)
+
+class CollectionDocFromSearchView(CollectionDocView):
+    @method_decorator(login_required(login_url="/tickets/"))
+    def post(self,request):
+        ticket_id = request.POST.get('ticket')
+        print(ticket_id)
+        collection_id = request.POST.get('collection')
+        colletion = get_object_or_404(Collection,collection_id=collection_id)
+        ticket = Ticket.objects.filter(zd_ticket_id=ticket_id).first()
+        colletion_doc,created = CollectionDocTicket.objects.get_or_create(collection=colletion)
+        colletion_doc.collection = colletion
+        colletion_doc.ticket.add(ticket)
+        colletion_doc.save()
+        return HttpResponseRedirect(reverse('collection-doc-details',kwargs={'collection_id':colletion.collection_id}))
+
+
+class RemoveTicketFromDocView(View):
+    @method_decorator(login_required(login_url="/tickets/"))
+    def get(self, request,ticket_id,collection_doc_ticket_id):
+        context = {}
+        collection_doc = get_object_or_404(CollectionDocTicket,collection_doc_ticket_id=collection_doc_ticket_id)
+        ticket = get_object_or_404(Ticket, ticket_id=ticket_id)
+        collection_doc.ticket.remove(ticket)
+        collection_doc.save()
+        context['collection'] = collection_doc.collection
+        return HttpResponseRedirect(
+            reverse('collection-doc-details', kwargs={'collection_id': collection_doc.collection.collection_id}))
 
 class CollectionListView(ListView):
     model = Collection
@@ -197,16 +254,36 @@ class CollectionDetailsView(View):
     @method_decorator(login_required(login_url="/tickets/"))
     def get(self, request, id_obj):
         obj = get_object_or_404(Collection, collection_id=id_obj)
-        context = {}
-        context['collection'] = obj
-        return render(request, self.template_name, context)
+        try:
+            collection_doc = CollectionDocTicket.objects.filter(collection=obj)
+            return HttpResponseRedirect(reverse('collection-doc-details', kwargs={'collection_id': obj.collection_id}))
+        except CollectionDocTicket.DoesNotExist:
+            context = {}
+            context['collection'] = obj
+            return render(request, self.template_name, context)
 
+class CollectionDocDownloadView(View):
+    @method_decorator(login_required(login_url="/tickets/"))
+    def get(self, request, pk):
+        collection_doc = get_object_or_404(CollectionDocTicket, collection_doc_ticket_id=pk)
+        line = ''
+        for ticket in collection_doc.ticket.all():
+            line = "Ticket # %s Request Date: %s \r"%(ticket.zd_ticket_id,ticket.created_at)
+            line += "Subject : %s \r"%ticket.subject
+            line += ticket.requester +"\r"
+            for comment in ticket.comment_ticket.all():
+                line += " \t\t %s \r"%comment.created_at
+                line += " \t\t %s \r"%comment.posted_by
+                line += " \t\t %s \r"%comment.plain_body
+            line += '----------------------------------------------\r'
+        response = HttpResponse(line,content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename="collection-doc.txt"'
 
+        return response
 
 
 class SearchResultsView(View):
     template_name = "search_results.html"
-
 
 
     @method_decorator(login_required(login_url="/tickets/"))
@@ -238,8 +315,8 @@ class DashboardView(View):
 
     @method_decorator(login_required(login_url="/tickets/"))
     def get(self,request):
-        return render(request, self.template_name)
-
+        # return render(request, self.template_name)
+        return HttpResponseRedirect(reverse('new_collection'))
 
 class LoginFailedView(View):
     template_name = 'login_error.html'

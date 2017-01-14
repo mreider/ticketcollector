@@ -1,0 +1,52 @@
+    <iframe id="my_iframe" style="display:none;"></iframe>
+    <div class="modal-dialog">
+        <form id="collect-doc-download-form" action="{% url 'download-collection-doc' object.collection_doc_ticket_id%}" method="get">
+            {% csrf_token %}
+      <div class="modal-content panel-warning">
+        <div class="modal-header panel-heading">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Collection Doc Details</h4>
+        </div>
+        <div class="modal-body">
+            {% for ticket in object.ticket.all %}
+                <div class="row">
+                    <div class="col-sm-2">
+                    Ticket # <span id="ticket_id_holder">{{ticket.zd_ticket_id}}</span>
+                    </div>
+                    <div class="col-sm-3">
+                        Request Date <span {{ticket.created_at}}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    Subject : {{ticket.subject}}
+                </div>
+                <div class="row">
+                    {{ticket.requester}}
+                </div>
+                <div class="row">
+                    {{ticket.description}}
+                </div>
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-5">
+                        {% for comment in ticket.comment_ticket.all %}
+                            <ul>
+                                <li>{{comment.created_at}}</li>
+                                <li>{{comment.posted_by}}</li>
+                                <li>{{comment.plain_body}}</li>
+                            </ul>
+                        {% endfor %}
+                    </div>
+                </div>
+                <hr/>
+            {% endfor %}
+        </div>
+
+        <div class="modal-footer">
+
+                <input type="submit" class="btn btn-primary" value="Download-File">
+            </form>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
