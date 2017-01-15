@@ -46,7 +46,7 @@
                         {% for ticket in collection.tickets.all %}
                             <tr>
                                 <td>
-                                    Requested : {{ticket.created_at}}
+                                    Requested : {{ticket.created_at | date:"m/d/y h:m:s A"}}
                                 </td>
                                 <td>
                                     <button class="btn view-btn" data-ticket="{{ticket.ticket_id}}" data-url="{% url 'ticket-detail' ticket.ticket_id %}">View</button>
@@ -83,7 +83,7 @@
                         {% for item in results %}
                             <tr>
                                 <td>
-                                    Request Data : {{item.created}}
+                                    Requested : {{item.created | date:"m/d/y h:m:s A"}}
                                 </td>
                                 <td>
                                     <button class="btn view-btn" data-ticket="{{item.ticket_id}}" data-url="{% url 'ticket-detail-search' ticket_id=item.ticket_id %}">View</button>

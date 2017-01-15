@@ -1,5 +1,6 @@
 import json
 
+from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -83,7 +84,7 @@ class TicketCommentItem:
         self.is_public = kwargs.get('is_public')
         self.comment = kwargs.get('comment')
         self.posted_by = kwargs.get('posted_by')
-        self.created_at = kwargs.get('created_at')
+        self.created_at = datetime.strptime(kwargs.get('created_at'), '%Y-%m-%dT%H:%M:%SZ')
     def __eq__(self, other):
         return self.comment_id==other.comment_id
 
@@ -104,7 +105,7 @@ class TicketItem:
         self.ticket_name = kwargs.get('name')
         self.ticket_id = kwargs.get('id')
 
-        self.created = kwargs.get('created')
+        self.created = datetime.strptime(kwargs.get('created'), '%Y-%m-%dT%H:%M:%SZ')
         self.requester = kwargs.get('requester')
         self.description = kwargs.get('description')
         self.is_public = kwargs.get('is_public')
@@ -284,7 +285,23 @@ class CollectionDocDownloadView(View):
 
 class SearchResultsView(View):
     template_name = "search_results.html"
-
+    def validate_search(self,search_query):
+        delimiter = "[+]"
+        if delimiter in search_query:
+            print 'Delimiter in search'
+            query = search_query.split(delimiter)
+            print 'Number of segments in Query -->%s'%query
+            is_valid = False
+            for segment in query:
+                if len(segment) > 0:
+                    is_valid = True
+                else:
+                    is_valid = False
+                    break
+            return is_valid
+        else:
+            print 'Delimiter not in search'
+            return True
 
     @method_decorator(login_required(login_url="/tickets/"))
     def get(self,request):
@@ -294,7 +311,11 @@ class SearchResultsView(View):
         context = {}
         context['query'] = search_query
         try:
-
+            if not self.validate_search(search_query):
+                print 'Query is not valid'
+                messages.add_message(request, messages.ERROR, "Invalid search query. [+] is a delimiter.")
+                return render(request, self.template_name, context)
+            print 'Query is valid'
             filtered_data = SearchHelper().search(search_query)
             context['results'] = filtered_data
             context['search_count'] = len(filtered_data) if len(filtered_data) > 0 else 0

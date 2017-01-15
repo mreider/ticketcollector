@@ -12,7 +12,7 @@
                     Ticket # <span id="ticket_id_holder">{{object.zd_ticket_id}}</span>
                     </div>
                     <div class="col-sm-3">
-                        Request Date <span id="ticket_created_at_holder">{{object.created_at}}</span>
+                        Request Date <span id="ticket_created_at_holder">{{object.created_at | date:"m/d/y h:m:s A"}}</span>
                     </div>
                 </div>
                 <div class="row">
