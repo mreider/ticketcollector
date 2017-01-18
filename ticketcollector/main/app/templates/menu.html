@@ -1,39 +1,21 @@
 {% load staticfiles %}
 <link rel="stylesheet" href="{% static 'css/main.css' %}">
 <div class="row">
-        <div class="jumbotron">
-            <h1>Zendesk Ticket Collector</h1>
-        </div>
-
+<h1>Zendesk Ticket Collector</h1>
 </div>
 <div class="row">
-      <nav class="navbar navbar-default">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#"><img src="{{request.user.profile.avatar}}" >
-                <span>{{request.user.first_name}} {{request.user.last_name}}</span></a>
-          </div>
-          <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-              <li class="active"><a href="{% url 'new_collection' %}">New Collection</a></li>
-              <li><a href="{% url 'list_collection' %}">Saved Collections</a></li>
-              <li><a href="{% url 'logout' %}">Logout</a></li>
-
-            </ul>
-              <ul class="nav navbar-nav navbar-right">
-                <li> <p class="navbar-text" id="current-collection" {% if not collection %} style="display:none;" {% endif %}>
-                    {% if collection %}
-                        Current Collection Name : {{collection.name}}
-                    {% endif %}
-                    </p></li>
-              </ul>
-          </div><!--/.nav-collapse -->
-        </div><!--/.container-fluid -->
-      </nav>
-    </div>
+<img src="{{request.user.profile.avatar}}">
+<span>{{request.user.first_name}} {{request.user.last_name}}</span>
+</div>
+<p>&nbsp;</p>
+<div class="row">      
+<a href="{% url 'new_collection' %}" class="btn btn-default btn-lg ">New Collection</a>
+<a href="{% url 'list_collection' %}" class="btn btn-default btn-lg ">Saved Collections</a>
+<a href="{% url 'logout' %}" class="btn btn-default btn-lg">Logout</a>
+<p class="lead" id="current-collection" {% if not collection %} style="display:none;" {% endif %}>
+{% if collection %}
+Current Collection Name : {{collection.name}}
+{% endif %}
+</p>
+</div>
+<p>&nbsp;</p>
