@@ -18,6 +18,9 @@ export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 # Create the run directory if it doesn't exist
 RUNDIR=$(dirname $SOCKFILE)
 test -d $RUNDIR || mkdir -p $RUNDIR
+#Kill existing session
+
+kill $(ps aux | grep 'gunicorn' | awk '{print $2}')
 
 # Start your Django Unicorn
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
