@@ -8,5 +8,5 @@ requests-oauthlib==0.7.0
 six==1.10.0
 social-auth-app-django==0.1.0
 social-auth-core==0.2.1
-zdesk==2.5.0
 toolz==0.8.2
+zdesk==2.5.0
