@@ -9,4 +9,10 @@ def save_profile(backend, user, response, *args, **kwargs):
     if backend.name == 'google-oauth2':
         url = response['image'].get('url')
         profile.avatar = url
+    elif backend.name == 'zendesk':
+        if response.get('user'):
+            url = response.get('user').get('photo')
+        else :
+            url = ''
+        profile.avatar = url
     profile.save()

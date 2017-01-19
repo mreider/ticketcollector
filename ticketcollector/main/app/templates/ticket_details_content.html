@@ -1,6 +1,7 @@
     <div class="modal-dialog">
-        <form method="post" action="" id="save-collection-doc-form">
+        <form method="post" action="{% url 'collection-doc-details' request.session.collection_id %}" id="save-collection-doc-form">
             {% csrf_token %}
+            <input type="hidden" name="ticket" value="{{object.ticket_id}}"/>
       <div class="modal-content panel-warning">
         <div class="modal-header panel-heading">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

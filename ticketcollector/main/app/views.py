@@ -149,6 +149,8 @@ class CollectionSaveView(View):
             instance = form.save()
             filtered_data = SearchHelper().search(request.POST.get('search_criteria'))
             self.save_seach_results(instance,filtered_data)
+            collection_id = instance.collection_id
+            request.session['collection_id'] = collection_id
             return JsonResponse({"status":"Success",
                                  "message": "Collection name already exists.Choose another name.",
                                  "collection_id":instance.collection_id,
@@ -191,6 +193,7 @@ class CollectionDocDetailsView(View):
     def post(self,request,collection_id):
         ticket_id = request.POST.get('ticket')
         colletion = get_object_or_404(Collection,collection_id=collection_id)
+
         ticket = get_object_or_404(Ticket,ticket_id=ticket_id)
         colletion_doc,created = CollectionDocTicket.objects.get_or_create(collection=colletion)
         colletion_doc.collection = colletion
@@ -203,6 +206,7 @@ class CollectionDocDetailsView(View):
         context = {}
         collection = get_object_or_404(Collection,collection_id=collection_id)
         context['collection'] = collection
+        request.session['collection_id'] = collection.collection_id
         return render(request, self.template_name, context)
 
 class CollectionDocFromSearchView(CollectionDocView):

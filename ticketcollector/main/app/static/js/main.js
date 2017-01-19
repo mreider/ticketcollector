@@ -23,6 +23,8 @@ $(document).ready(function() {
             var url = $(this).data('url');
             var collection = $(this).data('collection');
             var ticket = $(this).data('ticket');
+            console.log('Ticket');
+            console.log(ticket);
             var form = $(document.createElement('form'));
             $(form).attr("action", url);
             $(form).attr("method", "POST");

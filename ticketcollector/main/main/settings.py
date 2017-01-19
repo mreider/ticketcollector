@@ -132,10 +132,12 @@ STATICFILES_DIRS = [
 
 ]
 SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ['gmail.com']
+SOCIAL_AUTH_ZENDESK_OAUTH2_WHITELISTED_DOMAINS = ['checkr.com']
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'social_core.backends.google.GoogleOpenId',
     'django.contrib.auth.backends.ModelBackend',
+    'app.social_auth_backend.GithubOAuth2',
 )
 # LOGIN_URL = '/login/social/'
 LOGIN_REDIRECT_URL = '/tickets/new_collection/'
