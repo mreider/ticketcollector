@@ -131,8 +131,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "app","static"),
 
 ]
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ['gmail.com']
-SOCIAL_AUTH_ZENDESK_OAUTH2_WHITELISTED_DOMAINS = ['checkr.com']
+
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'social_core.backends.google.GoogleOpenId',
@@ -144,8 +143,7 @@ LOGIN_REDIRECT_URL = '/tickets/new_collection/'
 # LOGIN_ERROR_URL    = '/login-error/'
 LOGIN_ERROR_URL = '/tickets/login-error/'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '847413011409-nm6os927jre5ubfs97o7n2e5dl0meeqn.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'BpDcfUIiG8pz-ve1mp3G68hV'
+
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_IGNORE_DEFAULT_SCOPE = True
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
@@ -174,12 +172,6 @@ SOCIAL_AUTH_DISCONNECT_PIPELINE = (
     'social.pipeline.disconnect.disconnect'
 )
 
-ZENDDESK_CONFIG = {
-    'zdesk_email': 'jijoy21@gmail.com',
-    'zdesk_password': '9zVh79RQHIkTqwgMtkR9jsLQJJSNGxZtC4qUkRP8',
-    'zdesk_url': 'https://jijoytest.zendesk.com',
-    'zdesk_token': True
-}
 
 MESSAGE_TAGS = {
     constants.ERROR: 'danger',
