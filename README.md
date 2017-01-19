@@ -22,7 +22,8 @@ Production Deployment
 
 Production deployment is done using nginx in reverse proxy mode with gunicorn running the application container.
 
-1. Go to /webapp/ticketcollector/deployment
-2. . ./gunicorn_start.sh & , it will kill existing gunicorn session and start new. This is required after eah code changes.
-3. sudo service nginx restart -- restart nginx server.
+1. Go to /webapp/ticketcollector/ticketcollector/main/main/base.py and update your specific config
+2. Go to /webapp/ticketcollector/deployment
+3. . ./gunicorn_start.sh & , it will kill existing gunicorn session and start new. This is required after eah code changes.
+4. sudo service nginx restart -- restart nginx server.
    
