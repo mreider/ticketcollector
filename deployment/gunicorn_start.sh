@@ -29,4 +29,5 @@ exec ../../../env/bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
   --workers $NUM_WORKERS \
   --bind=unix:$SOCKFILE \
   --log-level=debug \
-  --log-file=-
+  --capture-output \
+  --log-file=/webapp/logs/ticketcollector.log

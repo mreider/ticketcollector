@@ -36,8 +36,13 @@ class SearchHelper():
                                    requester=requester,description=item.get('description'),
                                    is_public=item.get('is_public'))
             for cm in comments_response.get('comments'):
-                posted_by_response = zendesk.user_show(id=cm.get('author_id')).get('user')
-                posted_by = posted_by_response.get('name') + ' ' + posted_by_response.get('email')
+		print 'User Data %s'%posted_by_response
+		name = posted_by_response.get('name') if posted_by_response.get('name') else cm.get('author_id')
+		email = posted_by_response.get('email') if posted_by_response.get('email') else ''
+  	        posted_by = name + ' ' + email
+
+                #posted_by_response = zendesk.user_show(id=cm.get('author_id')).get('user')
+                #posted_by = posted_by_response.get('name') + ' ' + posted_by_response.get('email')
                 ticket_item.get_comments().append(TicketCommentItem(comment_id=cm.get('id'),ticket_id=ticket_id,
                                              is_public=cm.get('public'),comment=cm.get('plain_body'),
                                              posted_by=posted_by,created_at=cm.get('created_at')))
