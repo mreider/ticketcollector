@@ -30,11 +30,13 @@
                     <div class="col-sm-2"></div>
                     <div class="col-sm-5">
                         {% for comment in ticket.comment_ticket.all %}
+                        	{% if comment.is_public %}
                             <ul>
                                 <li>{{comment.created_at}}</li>
                                 <li>{{comment.posted_by}}</li>
                                 <li>{{comment.plain_body}}</li>
                             </ul>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </div>

@@ -282,9 +282,10 @@ class CollectionDocDownloadView(View):
             line += "Subject : %s \r"%ticket.subject
             line += ticket.requester +"\r"
             for comment in ticket.comment_ticket.all():
-                line += " \t\t %s \r"%comment.created_at
-                line += " \t\t %s \r"%comment.posted_by
-                line += " \t\t %s \r"%comment.plain_body
+            	if comment.is_public:
+  		   line += " \t\t %s \r"%comment.created_at
+		   line += " \t\t %s \r"%comment.posted_by
+		   line += " \t\t %s \r"%comment.plain_body
             line += '----------------------------------------------\r'
         response = HttpResponse(line,content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename="collection-doc.txt"'
